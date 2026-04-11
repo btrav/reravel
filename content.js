@@ -262,7 +262,8 @@ const ALL_SETTINGS_KEYS = ['grayscale', 'contrast', 'opacity', 'vignette', 'time
 
 function syncState() {
   chrome.storage.local.get(['enabled', 'bizarro'], ({ enabled, bizarro }) => {
-    if (!enabled) return deactivate();
+    // Default to enabled if storage hasn't been initialized yet
+    if (enabled === false) return deactivate();
     chrome.storage.sync.get(ALL_SETTINGS_KEYS, (settings) => {
       activate(!!bizarro, settings);
     });
