@@ -6,7 +6,7 @@ const SLIDER_DEFAULTS = {
   grayscale: 100,
   contrast: 70,
   opacity: 60,
-  blur: 30,
+  blur: 25,
   vignette: 70,
   timerSeconds: 12,
 };
@@ -115,7 +115,7 @@ async function loadToggles() {
     // Default to true for flattenWeight and denseLineHeight
     toggles[key].checked = stored[key] !== false;
   }
-  fontOverrideSelect.value = stored.fontOverride || 'none';
+  fontOverrideSelect.value = stored.fontOverride ?? 'serif';
 }
 
 fontOverrideSelect.addEventListener('change', async () => {
@@ -131,8 +131,8 @@ document.getElementById('reset-effects-btn').addEventListener('click', async () 
   for (const key of TOGGLE_KEYS) {
     toggles[key].checked = true;
   }
-  fontOverrideSelect.value = 'none';
-  await chrome.storage.sync.set({ fontOverride: 'none' });
+  fontOverrideSelect.value = 'serif';
+  await chrome.storage.sync.set({ fontOverride: 'serif' });
   await saveSliders();
   await saveToggles();
   showStatus('Effects reset to defaults');
@@ -215,6 +215,14 @@ async function saveSites() {
   chrome.runtime.sendMessage({ type: 'SITES_UPDATED' });
 }
 
+// Sites that have static host_permissions in manifest.json
+const BUILTIN_SITES = [
+  'reddit.com', 'youtube.com', 'discord.com', 'twitter.com', 'x.com',
+  'instagram.com', 'tiktok.com', 'facebook.com', 'threads.net', 'snapchat.com',
+  'pinterest.com', 'tumblr.com', 'bsky.app', 'twitch.tv',
+  'imgur.com', 'quora.com', 'mastodon.social', 'news.ycombinator.com',
+];
+
 async function addSite() {
   const hostname = normalizeHostname(siteInput.value);
   if (!hostname) return;
@@ -230,6 +238,17 @@ async function addSite() {
     return;
   }
 
+  // Request permission for non-builtin sites
+  if (!BUILTIN_SITES.includes(hostname)) {
+    const granted = await chrome.permissions.request({
+      origins: [`https://*.${hostname}/*`]
+    });
+    if (!granted) {
+      showStatus(`Permission denied for ${hostname}`);
+      return;
+    }
+  }
+
   sites.push(hostname);
   sites.sort();
   await saveSites();
@@ -241,6 +260,12 @@ async function addSite() {
 async function removeSite(hostname) {
   sites = sites.filter((s) => s !== hostname);
   await saveSites();
+
+  // Revoke permission for non-builtin sites
+  if (!BUILTIN_SITES.includes(hostname)) {
+    chrome.permissions.remove({ origins: [`https://*.${hostname}/*`] }).catch(() => {});
+  }
+
   renderList();
   showStatus(`Removed ${hostname}`);
 }

@@ -4,7 +4,29 @@
   "version": "0.2.0",
   "description": "Grayscale social media to reclaim your focus.",
   "permissions": ["storage", "tabs", "scripting", "alarms"],
-  "host_permissions": ["<all_urls>"],
+  "host_permissions": [
+    "https://*.reddit.com/*",
+    "https://*.youtube.com/*",
+    "https://*.discord.com/*",
+    "https://*.twitter.com/*",
+    "https://*.x.com/*",
+    "https://*.instagram.com/*",
+    "https://*.tiktok.com/*",
+    "https://*.facebook.com/*",
+    "https://*.threads.net/*",
+    "https://*.snapchat.com/*",
+    "https://*.pinterest.com/*",
+    "https://*.tumblr.com/*",
+    "https://*.bsky.app/*",
+    "https://*.twitch.tv/*",
+    "https://*.imgur.com/*",
+    "https://*.quora.com/*",
+    "https://*.mastodon.social/*",
+    "https://*.news.ycombinator.com/*"
+  ],
+  "optional_host_permissions": [
+    "https://*/*"
+  ],
   "background": {
     "service_worker": "background.js"
   },

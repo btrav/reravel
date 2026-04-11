@@ -8,7 +8,7 @@ const DEFAULTS = {
   grayscale: 100,
   contrast: 70,
   opacity: 60,
-  blur: 30,
+  blur: 25,
   vignette: 70,
   timerSeconds: 12,
 };
@@ -65,18 +65,21 @@ function buildTypographyCSS(settings, bizarro) {
     rules.push('font-style: italic !important;');
     rules.push('word-spacing: 0.15em !important;');
     rules.push('letter-spacing: -0.08em !important;');
-  } else if (settings.fontOverride && settings.fontOverride !== 'none') {
-    const fontMap = {
-      monospace: '"Courier New", Courier, monospace',
-      serif: '"Times New Roman", "Noto Serif", Georgia, serif',
-      'sans-serif': 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-    };
-    rules.push(`font-family: ${fontMap[settings.fontOverride]} !important;`);
+  } else {
+    const font = settings.fontOverride ?? 'serif';
+    if (font !== 'none') {
+      const fontMap = {
+        monospace: '"Courier New", Courier, monospace',
+        serif: '"Times New Roman", "Noto Serif", Georgia, serif',
+        'sans-serif': 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+      };
+      rules.push(`font-family: ${fontMap[font]} !important;`);
+    }
   }
-  if (settings.flattenWeight) {
+  if (settings.flattenWeight !== false) {
     rules.push('font-weight: 400 !important;');
   }
-  if (settings.denseLineHeight) {
+  if (settings.denseLineHeight !== false) {
     rules.push('line-height: 1.15 !important;');
   }
 

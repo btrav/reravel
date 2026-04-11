@@ -11,8 +11,12 @@ const DEFAULT_SITES = [
   'snapchat.com',
   'pinterest.com',
   'tumblr.com',
-  'linkedin.com',
   'bsky.app',
+  'twitch.tv',
+  'imgur.com',
+  'quora.com',
+  'mastodon.social',
+  'news.ycombinator.com',
 ];
 const CONTENT_SCRIPT_ID = 'reravel-content';
 const SNOOZE_ALARM = 'reravel-snooze';
