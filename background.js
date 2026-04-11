@@ -1,4 +1,19 @@
-const DEFAULT_SITES = ['reddit.com', 'youtube.com', 'discord.com'];
+const DEFAULT_SITES = [
+  'reddit.com',
+  'youtube.com',
+  'discord.com',
+  'twitter.com',
+  'x.com',
+  'instagram.com',
+  'tiktok.com',
+  'facebook.com',
+  'threads.net',
+  'snapchat.com',
+  'pinterest.com',
+  'tumblr.com',
+  'linkedin.com',
+  'bsky.app',
+];
 const CONTENT_SCRIPT_ID = 'reravel-content';
 const SNOOZE_ALARM = 'reravel-snooze';
 
