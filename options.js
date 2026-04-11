@@ -1,11 +1,12 @@
 const DEFAULT_MESSAGE = 'Take a deep breath.';
 
-const TOGGLE_KEYS = ['flattenWeight', 'monospaceFont', 'denseLineHeight'];
-const SLIDER_KEYS = ['grayscale', 'contrast', 'opacity', 'vignette', 'timerSeconds'];
+const TOGGLE_KEYS = ['flattenWeight', 'denseLineHeight'];
+const SLIDER_KEYS = ['grayscale', 'contrast', 'opacity', 'blur', 'vignette', 'timerSeconds'];
 const SLIDER_DEFAULTS = {
   grayscale: 100,
   contrast: 70,
   opacity: 60,
+  blur: 30,
   vignette: 70,
   timerSeconds: 12,
 };
@@ -17,12 +18,14 @@ const statusMsg = document.getElementById('status-msg');
 const messageInput = document.getElementById('message-input');
 const saveMessageBtn = document.getElementById('save-message-btn');
 const resetMessageBtn = document.getElementById('reset-message-btn');
+const showQuotesToggle = document.getElementById('toggle-show-quotes');
 
 // Slider elements
 const sliders = {
   grayscale: document.getElementById('slider-grayscale'),
   contrast: document.getElementById('slider-contrast'),
   opacity: document.getElementById('slider-opacity'),
+  blur: document.getElementById('slider-blur'),
   vignette: document.getElementById('slider-vignette'),
   timerSeconds: document.getElementById('slider-timer'),
 };
@@ -31,6 +34,7 @@ const sliderValues = {
   grayscale: document.getElementById('val-grayscale'),
   contrast: document.getElementById('val-contrast'),
   opacity: document.getElementById('val-opacity'),
+  blur: document.getElementById('val-blur'),
   vignette: document.getElementById('val-vignette'),
   timerSeconds: document.getElementById('val-timer'),
 };
@@ -38,9 +42,10 @@ const sliderValues = {
 // Toggle elements
 const toggles = {
   flattenWeight: document.getElementById('toggle-flatten-weight'),
-  monospaceFont: document.getElementById('toggle-monospace'),
   denseLineHeight: document.getElementById('toggle-line-height'),
 };
+
+const fontOverrideSelect = document.getElementById('font-override');
 
 let sites = [];
 
@@ -73,8 +78,7 @@ function getSliderSettings() {
 async function saveSliders() {
   const settings = getSliderSettings();
   await chrome.storage.sync.set(settings);
-  // Broadcast live update to all content scripts (include toggles)
-  chrome.runtime.sendMessage({ type: 'SETTINGS_UPDATED', settings: { ...settings, ...getToggleSettings() } });
+  chrome.runtime.sendMessage({ type: 'SETTINGS_UPDATED', settings: { ...settings, ...getToggleSettings(), fontOverride: fontOverrideSelect.value } });
 }
 
 // Wire up each slider
@@ -98,7 +102,7 @@ function getToggleSettings() {
 async function saveToggles() {
   const settings = getToggleSettings();
   await chrome.storage.sync.set(settings);
-  chrome.runtime.sendMessage({ type: 'SETTINGS_UPDATED', settings: { ...getSliderSettings(), ...settings } });
+  chrome.runtime.sendMessage({ type: 'SETTINGS_UPDATED', settings: { ...getSliderSettings(), ...settings, fontOverride: fontOverrideSelect.value } });
 }
 
 for (const key of TOGGLE_KEYS) {
@@ -106,11 +110,33 @@ for (const key of TOGGLE_KEYS) {
 }
 
 async function loadToggles() {
-  const stored = await chrome.storage.sync.get(TOGGLE_KEYS);
+  const stored = await chrome.storage.sync.get([...TOGGLE_KEYS, 'fontOverride']);
   for (const key of TOGGLE_KEYS) {
-    toggles[key].checked = !!stored[key];
+    // Default to true for flattenWeight and denseLineHeight
+    toggles[key].checked = stored[key] !== false;
   }
+  fontOverrideSelect.value = stored.fontOverride || 'none';
 }
+
+fontOverrideSelect.addEventListener('change', async () => {
+  await chrome.storage.sync.set({ fontOverride: fontOverrideSelect.value });
+  chrome.runtime.sendMessage({ type: 'SETTINGS_UPDATED', settings: { ...getSliderSettings(), ...getToggleSettings(), fontOverride: fontOverrideSelect.value } });
+});
+
+document.getElementById('reset-effects-btn').addEventListener('click', async () => {
+  for (const key of SLIDER_KEYS) {
+    sliders[key].value = SLIDER_DEFAULTS[key];
+    updateSliderDisplay(key);
+  }
+  for (const key of TOGGLE_KEYS) {
+    toggles[key].checked = true;
+  }
+  fontOverrideSelect.value = 'none';
+  await chrome.storage.sync.set({ fontOverride: 'none' });
+  await saveSliders();
+  await saveToggles();
+  showStatus('Effects reset to defaults');
+});
 
 async function loadSliders() {
   const stored = await chrome.storage.sync.get(SLIDER_KEYS);
@@ -124,9 +150,15 @@ async function loadSliders() {
 // --- Interstitial message ---
 
 async function loadMessage() {
-  const { interstitialMessage } = await chrome.storage.sync.get('interstitialMessage');
+  const { interstitialMessage, showQuotes } = await chrome.storage.sync.get(['interstitialMessage', 'showQuotes']);
   messageInput.value = interstitialMessage || DEFAULT_MESSAGE;
+  showQuotesToggle.checked = showQuotes !== false; // default to true
 }
+
+showQuotesToggle.addEventListener('change', async () => {
+  await chrome.storage.sync.set({ showQuotes: showQuotesToggle.checked });
+  showStatus(showQuotesToggle.checked ? 'Quotes enabled' : 'Quotes disabled');
+});
 
 saveMessageBtn.addEventListener('click', async () => {
   const msg = messageInput.value.trim();

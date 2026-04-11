@@ -11,7 +11,15 @@
 
     <section class="section">
       <h2>Interstitial message</h2>
-      <p class="section-desc">Your personal prompt, shown below a random quote during the pause.</p>
+      <p class="section-desc">Your personal prompt, shown during the pause.</p>
+
+      <div class="toggle-group" style="margin-bottom: 16px;">
+        <label class="toggle-row">
+          <input id="toggle-show-quotes" type="checkbox" class="toggle-checkbox" checked>
+          <span class="toggle-label">Show quotes</span>
+          <span class="toggle-desc">Display a random quote above your message</span>
+        </label>
+      </div>
       <input
         id="message-input"
         type="text"
@@ -75,6 +83,14 @@
 
       <div class="slider-group">
         <div class="slider-header">
+          <label for="slider-blur">Blur</label>
+          <span id="val-blur" class="slider-value">30%</span>
+        </div>
+        <input id="slider-blur" type="range" min="0" max="100" value="30" class="slider">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
           <label for="slider-vignette">Vignette</label>
           <span id="val-vignette" class="slider-value">70%</span>
         </div>
@@ -89,11 +105,13 @@
         <input id="slider-timer" type="range" min="3" max="30" value="12" class="slider">
       </div>
 
+      <button id="reset-effects-btn" type="button" class="btn-secondary">Reset to defaults</button>
+
       <h3 class="subsection-heading">Typography</h3>
 
       <div class="toggle-group">
         <label class="toggle-row">
-          <input id="toggle-flatten-weight" type="checkbox" class="toggle-checkbox">
+          <input id="toggle-flatten-weight" type="checkbox" class="toggle-checkbox" checked>
           <span class="toggle-label">Flatten font weight</span>
           <span class="toggle-desc">Remove bold text to flatten visual hierarchy</span>
         </label>
@@ -101,18 +119,20 @@
 
       <div class="toggle-group">
         <label class="toggle-row">
-          <input id="toggle-monospace" type="checkbox" class="toggle-checkbox">
-          <span class="toggle-label">Monospace font</span>
-          <span class="toggle-desc">Override all fonts with system monospace</span>
-        </label>
-      </div>
-
-      <div class="toggle-group">
-        <label class="toggle-row">
-          <input id="toggle-line-height" type="checkbox" class="toggle-checkbox">
+          <input id="toggle-line-height" type="checkbox" class="toggle-checkbox" checked>
           <span class="toggle-label">Dense line height</span>
           <span class="toggle-desc">Tighten line spacing to make text less inviting</span>
         </label>
+      </div>
+
+      <div class="font-select-group">
+        <label for="font-override" class="toggle-label">Font override</label>
+        <select id="font-override" class="font-select">
+          <option value="none">None (site default)</option>
+          <option value="monospace">Monospace</option>
+          <option value="serif">Serif</option>
+          <option value="sans-serif">Sans-serif</option>
+        </select>
       </div>
     </section>
 

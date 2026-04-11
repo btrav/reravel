@@ -8,6 +8,7 @@ const DEFAULTS = {
   grayscale: 100,
   contrast: 70,
   opacity: 60,
+  blur: 30,
   vignette: 70,
   timerSeconds: 12,
 };
@@ -21,11 +22,22 @@ function buildFilterCSS(settings, bizarro) {
   const g = settings.grayscale ?? DEFAULTS.grayscale;
   const c = settings.contrast ?? DEFAULTS.contrast;
   const o = settings.opacity ?? DEFAULTS.opacity;
+  const b = ((settings.blur ?? DEFAULTS.blur) * 2 / 100).toFixed(1); // 0-100 -> 0-2px
 
   if (bizarro) {
-    return `html { filter: invert(0.95) hue-rotate(200deg) saturate(2.5) contrast(${c / 100}) opacity(${o / 100}) !important; }`;
+    return `
+@keyframes reravel-hue-drift {
+  from { filter: invert(0.95) hue-rotate(0deg) saturate(2.5) blur(${b}px) contrast(${c / 100}) opacity(${o / 100}); }
+  to { filter: invert(0.95) hue-rotate(360deg) saturate(2.5) blur(${b}px) contrast(${c / 100}) opacity(${o / 100}); }
+}
+html {
+  filter: invert(0.95) hue-rotate(200deg) saturate(2.5) blur(${b}px) contrast(${c / 100}) opacity(${o / 100}) !important;
+  animation: reravel-hue-drift 30s linear infinite !important;
+  transform: rotate(0.5deg) !important;
+  transform-origin: center center !important;
+}`;
   }
-  return `html { filter: grayscale(${g}%) contrast(${c / 100}) opacity(${o / 100}) !important; }`;
+  return `html { filter: grayscale(${g}%) contrast(${c / 100}) opacity(${o / 100}) blur(${b}px) !important; }`;
 }
 
 function buildVignetteCSS(settings) {
@@ -45,11 +57,21 @@ function buildVignetteCSS(settings) {
 }`;
 }
 
-function buildTypographyCSS(settings) {
+function buildTypographyCSS(settings, bizarro) {
   const rules = [];
 
-  if (settings.monospaceFont) {
-    rules.push('font-family: "Courier New", Courier, monospace !important;');
+  if (bizarro) {
+    rules.push('font-family: "Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive !important;');
+    rules.push('font-style: italic !important;');
+    rules.push('word-spacing: 0.15em !important;');
+    rules.push('letter-spacing: -0.08em !important;');
+  } else if (settings.fontOverride && settings.fontOverride !== 'none') {
+    const fontMap = {
+      monospace: '"Courier New", Courier, monospace',
+      serif: '"Times New Roman", "Noto Serif", Georgia, serif',
+      'sans-serif': 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    };
+    rules.push(`font-family: ${fontMap[settings.fontOverride]} !important;`);
   }
   if (settings.flattenWeight) {
     rules.push('font-weight: 400 !important;');
@@ -62,9 +84,9 @@ function buildTypographyCSS(settings) {
   return `* { ${rules.join(' ')} }`;
 }
 
-function applyTypography(settings) {
+function applyTypography(settings, bizarro) {
   let style = document.getElementById(TYPO_STYLE_ID);
-  const css = buildTypographyCSS(settings);
+  const css = buildTypographyCSS(settings, bizarro);
 
   if (!css) {
     style?.remove();
@@ -88,7 +110,7 @@ function applyFilter(bizarro, settings) {
   }
   style.textContent = buildFilterCSS(settings, bizarro);
   applyVignette(settings);
-  applyTypography(settings);
+  applyTypography(settings, bizarro);
 }
 
 function applyVignette(settings) {
@@ -142,10 +164,10 @@ function showInterstitial(timerSeconds) {
   hideStyle.textContent = 'body { visibility: hidden !important; }';
   document.documentElement.appendChild(hideStyle);
 
-  // Pick a random quote and read custom message
+  // Pick a random quote and read custom message + quote preference
   const quote = RERAVEL_QUOTES[Math.floor(Math.random() * RERAVEL_QUOTES.length)];
 
-  chrome.storage.sync.get('interstitialMessage', ({ interstitialMessage }) => {
+  chrome.storage.sync.get(['interstitialMessage', 'showQuotes'], ({ interstitialMessage, showQuotes }) => {
     const message = interstitialMessage || DEFAULT_MESSAGE;
 
     function insertOverlay() {
@@ -213,8 +235,10 @@ function showInterstitial(timerSeconds) {
       });
       countdownEl.textContent = `${remaining}s`;
 
-      container.appendChild(quoteEl);
-      container.appendChild(authorEl);
+      if (showQuotes !== false) {
+        container.appendChild(quoteEl);
+        container.appendChild(authorEl);
+      }
       container.appendChild(messageEl);
       container.appendChild(countdownEl);
       overlay.appendChild(container);
@@ -258,16 +282,20 @@ function deactivate() {
   document.getElementById('reravel-hide')?.remove();
 }
 
-const ALL_SETTINGS_KEYS = ['grayscale', 'contrast', 'opacity', 'vignette', 'timerSeconds', 'flattenWeight', 'monospaceFont', 'denseLineHeight'];
+const ALL_SETTINGS_KEYS = ['grayscale', 'contrast', 'opacity', 'blur', 'vignette', 'timerSeconds', 'flattenWeight', 'denseLineHeight', 'fontOverride'];
 
 function syncState() {
-  chrome.storage.local.get(['enabled', 'bizarro'], ({ enabled, bizarro }) => {
-    // Default to enabled if storage hasn't been initialized yet
-    if (enabled === false) return deactivate();
-    chrome.storage.sync.get(ALL_SETTINGS_KEYS, (settings) => {
-      activate(!!bizarro, settings);
+  try {
+    chrome.storage.local.get(['enabled', 'bizarro'], ({ enabled, bizarro }) => {
+      // Default to enabled if storage hasn't been initialized yet
+      if (enabled === false) return deactivate();
+      chrome.storage.sync.get(ALL_SETTINGS_KEYS, (settings) => {
+        activate(!!bizarro, settings);
+      });
     });
-  });
+  } catch (_) {
+    // Extension context invalidated after reload/update
+  }
 }
 
 // Listen for toggle messages from background

@@ -287,6 +287,34 @@ h1 {
   padding-left: 24px;
 }
 
+/* Font select */
+.font-select-group {
+  margin-top: 16px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.font-select {
+  flex: 1;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #D1D1D1;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  background: white;
+  color: #1A1A1A;
+  cursor: pointer;
+}
+
+.font-select:focus {
+  outline: 2px solid #1A1A1A;
+  outline-offset: -1px;
+  border-color: transparent;
+}
+
 /* Screen reader only */
 .sr-only {
   position: absolute;
