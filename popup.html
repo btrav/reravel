@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup">
+    <header class="brand">RERAVEL</header>
+
+    <div class="toggle-area">
+      <button
+        id="toggle"
+        class="toggle-switch"
+        role="switch"
+        aria-checked="false"
+        aria-label="Toggle grayscale filter"
+      >
+        <span class="toggle-thumb"></span>
+      </button>
+      <p id="status-label" class="status-label">Grayscale off</p>
+    </div>
+
+    <div id="snooze-area" class="snooze-area">
+      <div id="snooze-buttons" class="snooze-buttons">
+        <button id="snooze-1" class="snooze-btn" aria-label="Snooze for 1 minute">Snooze 1 min</button>
+        <button id="snooze-5" class="snooze-btn" aria-label="Snooze for 5 minutes">Snooze 5 min</button>
+      </div>
+      <p id="snooze-status" class="snooze-status" aria-live="polite"></p>
+    </div>
+
+    <div class="bizarro-area">
+      <label class="bizarro-label">
+        <input
+          id="bizarro"
+          type="checkbox"
+          class="bizarro-checkbox"
+          aria-label="Toggle bizarro mode"
+        >
+        <span class="bizarro-check"></span>
+        Bizarro mode
+      </label>
+    </div>
+
+    <footer class="popup-footer">
+      <span id="site-label" class="site-label">Not a monitored site</span>
+      <a id="options-link" class="options-link" href="#">Settings</a>
+    </footer>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

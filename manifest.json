@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Reravel",
+  "version": "0.2.0",
+  "description": "Grayscale social media to reclaim your focus.",
+  "permissions": ["storage", "tabs", "scripting", "alarms"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "commands": {
+    "toggle-grayscale": {
+      "suggested_key": {
+        "default": "Alt+Shift+G"
+      },
+      "description": "Toggle grayscale on/off"
+    }
+  }
+}

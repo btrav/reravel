@@ -1,0 +1,220 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 300px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #F5F5F5;
+  color: #1A1A1A;
+}
+
+.popup {
+  display: flex;
+  flex-direction: column;
+  min-height: 260px;
+  padding: 20px 20px 16px;
+}
+
+/* Brand */
+.brand {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: #888888;
+  margin-bottom: 28px;
+}
+
+/* Toggle area */
+.toggle-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  justify-content: center;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 56px;
+  height: 30px;
+  border: none;
+  border-radius: 15px;
+  background: #D1D1D1;
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 160ms ease;
+}
+
+.toggle-switch:focus-visible {
+  outline: 2px solid #1A1A1A;
+  outline-offset: 3px;
+}
+
+.toggle-switch[aria-checked="true"] {
+  background: #2C2C2C;
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.20);
+  transition: transform 160ms ease;
+  pointer-events: none;
+}
+
+.toggle-switch[aria-checked="true"] .toggle-thumb {
+  transform: translateX(26px);
+}
+
+.status-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1A1A1A;
+}
+
+/* Snooze */
+.snooze-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-height: 56px;
+  margin-top: 20px;
+  justify-content: center;
+}
+
+.snooze-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.snooze-btn {
+  padding: 7px 18px;
+  border: 1px solid #C8C8C8;
+  border-radius: 5px;
+  background: white;
+  color: #1A1A1A;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  min-height: 32px;
+}
+
+.snooze-btn:hover {
+  background: #E8E8E8;
+  border-color: #AAAAAA;
+}
+
+.snooze-btn:focus-visible {
+  outline: 2px solid #1A1A1A;
+  outline-offset: 2px;
+}
+
+.snooze-status {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1A1A1A;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Bizarro mode */
+.bizarro-area {
+  margin-top: 16px;
+}
+
+.bizarro-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #888888;
+  cursor: pointer;
+  user-select: none;
+}
+
+.bizarro-label:hover {
+  color: #1A1A1A;
+}
+
+.bizarro-checkbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.bizarro-check {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #C8C8C8;
+  border-radius: 3px;
+  background: white;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.bizarro-checkbox:checked + .bizarro-check {
+  background: #2C2C2C;
+  border-color: #2C2C2C;
+}
+
+.bizarro-checkbox:checked + .bizarro-check::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.bizarro-checkbox:focus-visible + .bizarro-check {
+  outline: 2px solid #1A1A1A;
+  outline-offset: 2px;
+}
+
+/* Footer */
+.popup-footer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;
+  padding-top: 12px;
+  border-top: 1px solid #E0E0E0;
+}
+
+.site-label {
+  font-size: 11px;
+  font-weight: 400;
+  color: #AAAAAA;
+}
+
+.options-link {
+  font-size: 11px;
+  font-weight: 400;
+  color: #555555;
+  text-decoration: none;
+}
+
+.options-link:hover {
+  color: #1A1A1A;
+  text-decoration: underline;
+}
+
+.options-link:focus-visible {
+  outline: 2px solid #1A1A1A;
+  outline-offset: 2px;
+}
