@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Reravel",
-  "version": "0.2.0",
-  "description": "Grayscale social media to reclaim your focus.",
+  "version": "1.0.0",
+  "description": "Reclaim your focus by making distracting websites less interesting.",
   "permissions": ["storage", "tabs", "scripting", "alarms"],
   "host_permissions": [
     "https://*.reddit.com/*",
@@ -27,6 +27,12 @@
   "optional_host_permissions": [
     "https://*/*"
   ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
   "background": {
     "service_worker": "background.js"
   },
@@ -34,6 +40,7 @@
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
     }
