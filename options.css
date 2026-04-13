@@ -287,6 +287,15 @@ h1 {
   padding-left: 24px;
 }
 
+.toggle-desc a {
+  color: #555555;
+  text-decoration: underline;
+}
+
+.toggle-desc a:hover {
+  color: #1A1A1A;
+}
+
 /* Font select */
 .font-select-group {
   margin-top: 16px;

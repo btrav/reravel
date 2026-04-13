@@ -11,6 +11,8 @@ const SLIDER_DEFAULTS = {
   timerSeconds: 12,
 };
 
+const keyboardShortcutToggle = document.getElementById('toggle-keyboard-shortcut');
+
 const siteInput = document.getElementById('site-input');
 const addBtn = document.getElementById('add-btn');
 const siteListEl = document.getElementById('site-list');
@@ -279,6 +281,29 @@ document.addEventListener('DOMContentLoaded', async () => {
   loadMessage();
   loadSliders();
   loadToggles();
+  loadKeyboardShortcut();
+});
+
+// --- Keyboard shortcut ---
+
+// Set platform-appropriate shortcut label
+const isMac = navigator.platform.toUpperCase().includes('MAC');
+document.getElementById('shortcut-keys').textContent = isMac ? '⌥⇧G' : 'Alt+Shift+G';
+
+async function loadKeyboardShortcut() {
+  const { keyboardShortcut } = await chrome.storage.sync.get('keyboardShortcut');
+  keyboardShortcutToggle.checked = keyboardShortcut !== false;
+}
+
+keyboardShortcutToggle.addEventListener('change', async () => {
+  await chrome.storage.sync.set({ keyboardShortcut: keyboardShortcutToggle.checked });
+  showStatus(keyboardShortcutToggle.checked ? 'Keyboard shortcut enabled' : 'Keyboard shortcut disabled');
+});
+
+// chrome:// URLs can't be opened via <a> tags, need to use chrome.tabs
+document.getElementById('shortcut-link').addEventListener('click', (e) => {
+  e.preventDefault();
+  chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
 });
 
 addBtn.addEventListener('click', addSite);

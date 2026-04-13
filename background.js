@@ -137,8 +137,12 @@ async function broadcastBizarro(bizarro) {
 }
 
 // Keyboard shortcut
-chrome.commands.onCommand.addListener((command) => {
-  if (command === 'toggle-grayscale') toggle();
+chrome.commands.onCommand.addListener(async (command) => {
+  if (command === 'toggle-grayscale') {
+    const { keyboardShortcut } = await chrome.storage.sync.get('keyboardShortcut');
+    if (keyboardShortcut === false) return;
+    toggle();
+  }
 });
 
 // Messages from popup and options
