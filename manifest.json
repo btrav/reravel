@@ -1,7 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Reravel",
-  "version": "1.0.0",
+  "name": "Reravel - Make distracting websites boring",
+  "short_name": "Reravel",
+  "version": "1.0.1",
   "description": "Reclaim your focus by making distracting websites less interesting.",
   "permissions": ["storage", "tabs", "scripting", "alarms"],
   "host_permissions": [

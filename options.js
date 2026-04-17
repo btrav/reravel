@@ -1,7 +1,12 @@
 const DEFAULT_MESSAGE = 'Take a deep breath.';
 
-const TOGGLE_KEYS = ['flattenWeight', 'denseLineHeight'];
-const SLIDER_KEYS = ['grayscale', 'contrast', 'opacity', 'blur', 'vignette', 'timerSeconds'];
+const TOGGLE_KEYS = ['flattenWeight', 'denseLineHeight', 'hideMedia'];
+const TOGGLE_DEFAULTS = {
+  flattenWeight: true,
+  denseLineHeight: true,
+  hideMedia: false,
+};
+const SLIDER_KEYS = ['grayscale', 'contrast', 'opacity', 'blur', 'vignette', 'timerSeconds', 'mediaBlur'];
 const SLIDER_DEFAULTS = {
   grayscale: 100,
   contrast: 70,
@@ -9,6 +14,7 @@ const SLIDER_DEFAULTS = {
   blur: 25,
   vignette: 70,
   timerSeconds: 12,
+  mediaBlur: 10,
 };
 
 const keyboardShortcutToggle = document.getElementById('toggle-keyboard-shortcut');
@@ -30,6 +36,7 @@ const sliders = {
   blur: document.getElementById('slider-blur'),
   vignette: document.getElementById('slider-vignette'),
   timerSeconds: document.getElementById('slider-timer'),
+  mediaBlur: document.getElementById('slider-media-blur'),
 };
 
 const sliderValues = {
@@ -39,12 +46,14 @@ const sliderValues = {
   blur: document.getElementById('val-blur'),
   vignette: document.getElementById('val-vignette'),
   timerSeconds: document.getElementById('val-timer'),
+  mediaBlur: document.getElementById('val-mediaBlur'),
 };
 
 // Toggle elements
 const toggles = {
   flattenWeight: document.getElementById('toggle-flatten-weight'),
   denseLineHeight: document.getElementById('toggle-line-height'),
+  hideMedia: document.getElementById('toggle-hide-media'),
 };
 
 const fontOverrideSelect = document.getElementById('font-override');
@@ -114,8 +123,7 @@ for (const key of TOGGLE_KEYS) {
 async function loadToggles() {
   const stored = await chrome.storage.sync.get([...TOGGLE_KEYS, 'fontOverride']);
   for (const key of TOGGLE_KEYS) {
-    // Default to true for flattenWeight and denseLineHeight
-    toggles[key].checked = stored[key] !== false;
+    toggles[key].checked = stored[key] ?? TOGGLE_DEFAULTS[key];
   }
   fontOverrideSelect.value = stored.fontOverride ?? 'serif';
 }
@@ -131,7 +139,7 @@ document.getElementById('reset-effects-btn').addEventListener('click', async () 
     updateSliderDisplay(key);
   }
   for (const key of TOGGLE_KEYS) {
-    toggles[key].checked = true;
+    toggles[key].checked = TOGGLE_DEFAULTS[key];
   }
   fontOverrideSelect.value = 'serif';
   await chrome.storage.sync.set({ fontOverride: 'serif' });

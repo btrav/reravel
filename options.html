@@ -99,6 +99,22 @@
 
       <div class="slider-group">
         <div class="slider-header">
+          <label for="slider-media-blur">Media blur</label>
+          <span id="val-mediaBlur" class="slider-value">10%</span>
+        </div>
+        <input id="slider-media-blur" type="range" min="0" max="100" value="10" class="slider">
+      </div>
+
+      <div class="toggle-group">
+        <label class="toggle-row">
+          <input id="toggle-hide-media" type="checkbox" class="toggle-checkbox">
+          <span class="toggle-label">Hide media</span>
+          <span class="toggle-desc">Make images and videos nearly invisible (overrides media blur)</span>
+        </label>
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
           <label for="slider-timer">Pause duration</label>
           <span id="val-timer" class="slider-value">12s</span>
         </div>

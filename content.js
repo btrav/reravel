@@ -1,5 +1,6 @@
 const STYLE_ID = 'reravel-filter';
 const TYPO_STYLE_ID = 'reravel-typography';
+const MEDIA_STYLE_ID = 'reravel-media';
 const OVERLAY_ID = 'reravel-interstitial';
 const VIGNETTE_ID = 'reravel-vignette';
 const DEFAULT_MESSAGE = 'Take a deep breath.';
@@ -11,6 +12,8 @@ const DEFAULTS = {
   blur: 25,
   vignette: 70,
   timerSeconds: 12,
+  mediaBlur: 10,
+  hideMedia: false,
 };
 
 // Track whether interstitial has been shown this page load
@@ -87,6 +90,33 @@ function buildTypographyCSS(settings, bizarro) {
   return `* { ${rules.join(' ')} }`;
 }
 
+function buildMediaCSS(settings) {
+  if (settings.hideMedia) {
+    return `img, video, canvas, picture { opacity: 0.05 !important; }`;
+  }
+  const mb = settings.mediaBlur ?? DEFAULTS.mediaBlur;
+  if (mb === 0) return '';
+  const blur = (mb * 0.4).toFixed(1); // 0-100 -> 0-40px
+  return `img, video, canvas, picture { filter: blur(${blur}px) !important; }`;
+}
+
+function applyMediaStyle(settings) {
+  let style = document.getElementById(MEDIA_STYLE_ID);
+  const css = buildMediaCSS(settings);
+
+  if (!css) {
+    style?.remove();
+    return;
+  }
+
+  if (!style) {
+    style = document.createElement('style');
+    style.id = MEDIA_STYLE_ID;
+    document.documentElement.appendChild(style);
+  }
+  style.textContent = css;
+}
+
 function applyTypography(settings, bizarro) {
   let style = document.getElementById(TYPO_STYLE_ID);
   const css = buildTypographyCSS(settings, bizarro);
@@ -114,6 +144,7 @@ function applyFilter(bizarro, settings) {
   style.textContent = buildFilterCSS(settings, bizarro);
   applyVignette(settings);
   applyTypography(settings, bizarro);
+  applyMediaStyle(settings);
 }
 
 function applyVignette(settings) {
@@ -148,6 +179,7 @@ function applyVignette(settings) {
 function removeFilter() {
   document.getElementById(STYLE_ID)?.remove();
   document.getElementById(TYPO_STYLE_ID)?.remove();
+  document.getElementById(MEDIA_STYLE_ID)?.remove();
   document.getElementById(VIGNETTE_ID)?.remove();
   document.getElementById(VIGNETTE_ID + '-style')?.remove();
 }
@@ -285,7 +317,7 @@ function deactivate() {
   document.getElementById('reravel-hide')?.remove();
 }
 
-const ALL_SETTINGS_KEYS = ['grayscale', 'contrast', 'opacity', 'blur', 'vignette', 'timerSeconds', 'flattenWeight', 'denseLineHeight', 'fontOverride'];
+const ALL_SETTINGS_KEYS = ['grayscale', 'contrast', 'opacity', 'blur', 'vignette', 'timerSeconds', 'flattenWeight', 'denseLineHeight', 'fontOverride', 'mediaBlur', 'hideMedia'];
 
 function syncState() {
   try {
