@@ -36,6 +36,25 @@
     </section>
 
     <section class="section">
+      <h2>Snooze</h2>
+      <p class="section-desc">Adds a third button to the popup for longer breaks (e.g., watching a long video). Leave blank to hide.</p>
+      <div class="snooze-config">
+        <label for="custom-snooze-input" class="sr-only">Custom snooze minutes</label>
+        <input
+          id="custom-snooze-input"
+          type="number"
+          min="1"
+          max="60"
+          step="1"
+          placeholder="Minutes (1-60)"
+          autocomplete="off"
+        >
+        <button id="save-snooze-btn" type="button" class="btn-primary">Save</button>
+        <button id="clear-snooze-btn" type="button" class="btn-secondary">Clear</button>
+      </div>
+    </section>
+
+    <section class="section">
       <h2>Monitored sites</h2>
       <p class="section-desc">Sites where Reravel applies filters and the interstitial pause.</p>
       <div class="add-site">

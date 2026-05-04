@@ -290,6 +290,41 @@ document.addEventListener('DOMContentLoaded', async () => {
   loadSliders();
   loadToggles();
   loadKeyboardShortcut();
+  loadCustomSnooze();
+});
+
+// --- Custom snooze ---
+
+const customSnoozeInput = document.getElementById('custom-snooze-input');
+const saveSnoozeBtn = document.getElementById('save-snooze-btn');
+const clearSnoozeBtn = document.getElementById('clear-snooze-btn');
+
+async function loadCustomSnooze() {
+  const { customSnoozeMinutes } = await chrome.storage.sync.get('customSnoozeMinutes');
+  customSnoozeInput.value = Number.isInteger(customSnoozeMinutes) && customSnoozeMinutes > 0
+    ? customSnoozeMinutes
+    : '';
+}
+
+saveSnoozeBtn.addEventListener('click', async () => {
+  const raw = customSnoozeInput.value.trim();
+  if (!raw) {
+    showStatus('Enter a number from 1 to 60');
+    return;
+  }
+  const n = parseInt(raw, 10);
+  if (!Number.isInteger(n) || n < 1 || n > 60) {
+    showStatus('Snooze must be 1 to 60 minutes');
+    return;
+  }
+  await chrome.storage.sync.set({ customSnoozeMinutes: n });
+  showStatus(`Custom snooze set to ${n} min`);
+});
+
+clearSnoozeBtn.addEventListener('click', async () => {
+  customSnoozeInput.value = '';
+  await chrome.storage.sync.remove('customSnoozeMinutes');
+  showStatus('Custom snooze cleared');
 });
 
 // --- Keyboard shortcut ---

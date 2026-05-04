@@ -6,6 +6,7 @@ const snoozeButtons = document.getElementById('snooze-buttons');
 const snoozeStatus = document.getElementById('snooze-status');
 const snooze1 = document.getElementById('snooze-1');
 const snooze5 = document.getElementById('snooze-5');
+const snoozeCustom = document.getElementById('snooze-custom');
 const bizarroCheckbox = document.getElementById('bizarro');
 
 let snoozeInterval = null;
@@ -65,10 +66,27 @@ function isTargetSite(hostname, sites) {
 // Initialize popup state
 document.addEventListener('DOMContentLoaded', async () => {
   const { enabled, snoozeUntil, bizarro } = await chrome.storage.local.get(['enabled', 'snoozeUntil', 'bizarro']);
-  const { sites } = await chrome.storage.sync.get('sites');
+  const { sites, customSnoozeMinutes } = await chrome.storage.sync.get(['sites', 'customSnoozeMinutes']);
   const siteList = sites || [];
 
   bizarroCheckbox.checked = !!bizarro;
+
+  // Configure custom snooze button if a duration is set
+  const customMin = Number.isInteger(customSnoozeMinutes) && customSnoozeMinutes > 0 && customSnoozeMinutes <= 60
+    ? customSnoozeMinutes
+    : null;
+  if (customMin) {
+    const label = customMin >= 60 ? `Snooze 1 hr` : `Snooze ${customMin} min`;
+    snoozeCustom.textContent = label;
+    snoozeCustom.setAttribute('aria-label', `Snooze for ${customMin} minutes`);
+    snoozeCustom.hidden = false;
+    snoozeCustom.addEventListener('click', () => {
+      chrome.runtime.sendMessage({ type: 'SNOOZE', minutes: customMin });
+      const until = Date.now() + customMin * 60 * 1000;
+      updateUI(false, until);
+    });
+  }
+
   updateUI(!!enabled, snoozeUntil);
 
   // Show current site context

@@ -170,6 +170,34 @@ h1 {
   outline-offset: 3px;
 }
 
+/* Snooze config */
+.snooze-config {
+  display: flex;
+  gap: 8px;
+}
+
+.snooze-config input {
+  flex: 1;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #D1D1D1;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  background: white;
+  color: #1A1A1A;
+}
+
+.snooze-config input:focus {
+  outline: 2px solid #1A1A1A;
+  outline-offset: -1px;
+  border-color: transparent;
+}
+
+.snooze-config input::placeholder {
+  color: #AAAAAA;
+}
+
 /* Add site form */
 .add-site {
   display: flex;

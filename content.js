@@ -279,15 +279,54 @@ function showInterstitial(timerSeconds) {
       overlay.appendChild(container);
       document.body.appendChild(overlay);
 
-      const timer = setInterval(() => {
-        remaining--;
-        countdownEl.textContent = `${remaining}s`;
-        if (remaining <= 0) {
-          clearInterval(timer);
-          overlay.remove();
-          document.getElementById('reravel-hide')?.remove();
+      // Wall-clock countdown that pauses when the tab is not visible.
+      // After STALE_THRESHOLD_MS hidden, accumulated progress resets.
+      const STALE_THRESHOLD_MS = 10 * 60 * 1000;
+      const totalMs = duration * 1000;
+      let accumulatedVisibleMs = 0;
+      let lastVisibleStamp = document.hidden ? null : Date.now();
+      let lastHiddenAt = null;
+      let displayTimer = null;
+
+      function elapsed() {
+        let e = accumulatedVisibleMs;
+        if (lastVisibleStamp !== null) e += Date.now() - lastVisibleStamp;
+        return e;
+      }
+
+      function finish() {
+        if (displayTimer) clearInterval(displayTimer);
+        document.removeEventListener('visibilitychange', onVisibility);
+        overlay.remove();
+        document.getElementById('reravel-hide')?.remove();
+      }
+
+      function tick() {
+        const remainingSec = Math.max(0, Math.ceil((totalMs - elapsed()) / 1000));
+        countdownEl.textContent = `${remainingSec}s`;
+        if (remainingSec <= 0) finish();
+      }
+
+      function onVisibility() {
+        if (document.hidden) {
+          if (lastVisibleStamp !== null) {
+            accumulatedVisibleMs += Date.now() - lastVisibleStamp;
+            lastVisibleStamp = null;
+          }
+          lastHiddenAt = Date.now();
+        } else {
+          if (lastHiddenAt !== null && Date.now() - lastHiddenAt > STALE_THRESHOLD_MS) {
+            accumulatedVisibleMs = 0;
+          }
+          lastHiddenAt = null;
+          lastVisibleStamp = Date.now();
+          tick();
         }
-      }, 1000);
+      }
+
+      document.addEventListener('visibilitychange', onVisibility);
+      displayTimer = setInterval(tick, 1000);
+      tick();
     }
 
     if (document.body) {
