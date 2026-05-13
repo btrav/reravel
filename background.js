@@ -81,6 +81,11 @@ async function toggle() {
   const { enabled } = await chrome.storage.local.get('enabled');
   const next = !enabled;
   await chrome.storage.local.set({ enabled: next });
+  if (next) {
+    await chrome.storage.local.remove('disabledSince');
+  } else {
+    await chrome.storage.local.set({ disabledSince: Date.now() });
+  }
   await broadcastState(next);
 }
 
@@ -97,6 +102,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name === SNOOZE_ALARM) {
     await chrome.storage.local.set({ enabled: true });
     await chrome.storage.local.remove('snoozeUntil');
+    await chrome.storage.local.remove('disabledSince');
     await broadcastState(true);
   }
 });
@@ -185,4 +191,44 @@ chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'sync' && changes.sites) {
     registerContentScript();
   }
+});
+
+// Finalize "Watch this site" flow when the user grants permission.
+// The popup writes pendingAdd before requesting; we pick it up here because
+// the popup typically closes during the native permission prompt.
+chrome.permissions.onAdded.addListener(async (perms) => {
+  const { pendingAdd } = await chrome.storage.local.get('pendingAdd');
+  if (!pendingAdd) return;
+
+  // Drop stale entries (>10 min)
+  if (Date.now() - pendingAdd.timestamp > 10 * 60 * 1000) {
+    await chrome.storage.local.remove('pendingAdd');
+    return;
+  }
+
+  const expected = `https://*.${pendingAdd.hostname}/*`;
+  if (!perms.origins?.includes(expected)) return;
+
+  // Push hostname to user's site list (re-registration happens via onChanged listener)
+  const { sites } = await chrome.storage.sync.get('sites');
+  const updated = sites ? [...sites] : [];
+  if (!updated.includes(pendingAdd.hostname)) {
+    updated.push(pendingAdd.hostname);
+    updated.sort();
+    await chrome.storage.sync.set({ sites: updated });
+  }
+
+  // Inject content script into the originating tab so user doesn't have to refresh
+  if (pendingAdd.tabId) {
+    try {
+      await chrome.scripting.executeScript({
+        target: { tabId: pendingAdd.tabId },
+        files: ['quotes.js', 'content.js']
+      });
+    } catch (_) {
+      // Tab may have closed or navigated; new visits will pick up via registration
+    }
+  }
+
+  await chrome.storage.local.remove('pendingAdd');
 });

@@ -8,7 +8,7 @@
   <div class="popup">
     <header class="brand">RERAVEL</header>
 
-    <div class="toggle-area">
+    <div id="toggle-area" class="toggle-area">
       <button
         id="toggle"
         class="toggle-switch"
@@ -30,7 +30,7 @@
       <p id="snooze-status" class="snooze-status" aria-live="polite"></p>
     </div>
 
-    <div class="bizarro-area">
+    <div id="bizarro-area" class="bizarro-area">
       <label class="bizarro-label">
         <input
           id="bizarro"
@@ -43,11 +43,28 @@
       </label>
     </div>
 
+    <div id="empty-state" class="empty-state" hidden>
+      <h2 id="empty-headline" class="empty-headline"></h2>
+      <p id="empty-subhead" class="empty-subhead"></p>
+      <button id="watch-site-btn" class="empty-cta" hidden></button>
+    </div>
+
+    <div id="off-state" class="empty-state" hidden>
+      <h2 id="off-headline" class="empty-headline"></h2>
+      <div class="off-quote">
+        <p id="off-quote-text" class="off-quote-text"></p>
+        <p id="off-quote-author" class="off-quote-author"></p>
+      </div>
+      <p id="off-elapsed" class="off-elapsed"></p>
+      <button id="turn-on-btn" class="empty-cta">Turn on</button>
+    </div>
+
     <footer class="popup-footer">
-      <span id="site-label" class="site-label">Not a monitored site</span>
+      <span id="site-label" class="site-label"></span>
       <a id="options-link" class="options-link" href="#">Settings</a>
     </footer>
   </div>
+  <script src="quotes.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>
