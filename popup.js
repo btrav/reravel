@@ -306,5 +306,7 @@ snooze5.addEventListener('click', () => {
 // Options link
 optionsLink.addEventListener('click', (e) => {
   e.preventDefault();
-  chrome.runtime.openOptionsPage();
+  // chrome.runtime.openOptionsPage() fails silently in some Chromium forks (Arc, Brave)
+  // when manifest sets open_in_tab: true. Using chrome.tabs.create is more reliable.
+  chrome.tabs.create({ url: chrome.runtime.getURL('options.html') });
 });
